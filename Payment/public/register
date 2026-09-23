@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <title>Регистрация</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .container {
+      width: 100%;
+      max-width: 400px;
+      padding: 20px;
+    }
+    .card {
+      background: #fff;
+      border-radius: 16px;
+      padding: 40px 30px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    }
+    .card h1 {
+      margin: 0 0 10px 0;
+      color: #4f46e5;
+      text-align: center;
+      font-size: 1.8rem;
+    }
+    .subtitle {
+      text-align: center;
+      color: #666;
+      margin-bottom: 30px;
+    }
+    .form-group {
+      margin-bottom: 20px;
+    }
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: bold;
+      color: #374151;
+    }
+    .form-group input {
+      width: 100%;
+      padding: 12px 15px;
+      border: 2px solid #e5e7eb;
+      border-radius: 8px;
+      font-size: 1rem;
+      box-sizing: border-box;
+      transition: border-color 0.3s;
+    }
+    .form-group input:focus {
+      outline: none;
+      border-color: #4f46e5;
+    }
+    .requirements {
+      background: #f3f4f6;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      font-size: 0.9rem;
+    }
+    .requirements ul {
+      margin: 10px 0 0 0;
+      padding-left: 20px;
+      color: #4b5563;
+    }
+    .submit-btn {
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: #fff;
+      padding: 14px 28px;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      width: 100%;
+      transition: transform 0.2s;
+    }
+    .submit-btn:hover {
+      transform: translateY(-2px);
+    }
+    .submit-btn:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
+    .error-msg {
+      background: #fef2f2;
+      color: #dc2626;
+      padding: 12px 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      display: none;
+      border-left: 4px solid #dc2626;
+    }
+    .success-msg {
+      background: #f0fdf4;
+      color: #059669;
+      padding: 12px 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      display: none;
+      border-left: 4px solid #059669;
+    }
+    .links {
+      text-align: center;
+      margin-top: 25px;
+      color: #666;
+    }
+    .links a {
+      color: #4f46e5;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    .links a:hover {
+      text-decoration: underline;
+    }
+    .back-link {
+      display: inline-block;
+      margin-bottom: 20px;
+      color: #fff;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    .back-link:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <a href="/" class="back-link">← На главную</a>
+    
+    <div class="card">
+      <h1>📝 Регистрация</h1>
+      <p class="subtitle">Создайте новый аккаунт</p>
+      
+      <div class="requirements">
+        <strong>Требования:</strong>
+        <ul>
+          <li>Имя: минимум 3 символа</li>
+          <li>Пароль: минимум 6 символов</li>
+        </ul>
+      </div>
+      
+      <div class="error-msg" id="error-msg"></div>
+      <div class="success-msg" id="success-msg"></div>
+      
+      <form id="register-form">
+        <div class="form-group">
+          <label for="username">Имя пользователя</label>
+          <input type="text" id="username" name="username" required placeholder="Придумайте имя" minlength="3" />
+        </div>
+        
+        <div class="form-group">
+          <label for="password">Пароль</label>
+          <input type="password" id="password" name="password" required placeholder="Придумайте пароль" minlength="6" />
+        </div>
+        
+        <button type="submit" class="submit-btn" id="submit-btn">Зарегистрироваться</button>
+      </form>
+      
+      <div class="links">
+        Уже есть аккаунт? <a href="/login.html">Войти</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const registerForm = document.getElementById('register-form');
+    const errorMsg = document.getElementById('error-msg');
+    const successMsg = document.getElementById('success-msg');
+    const submitBtn = document.getElementById('submit-btn');
+
+    registerForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value;
+
+      errorMsg.style.display = 'none';
+      successMsg.style.display = 'none';
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Регистрация...';
+
+      try {
+        const response = await fetch('/api/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password }),
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          successMsg.textContent = '✅ Регистрация успешна! Перенаправление...';
+          successMsg.style.display = 'block';
+          
+          setTimeout(() => {
+            window.location.href = '/login.html';
+          }, 1500);
+        } else {
+          errorMsg.textContent = data.error || 'Ошибка регистрации';
+          errorMsg.style.display = 'block';
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Зарегистрироваться';
+        }
+      } catch (error) {
+        console.error('Ошибка:', error);
+        errorMsg.textContent = 'Ошибка сервера. Попробуйте позже.';
+        errorMsg.style.display = 'block';
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Зарегистрироваться';
+      }
+    });
+  </script>
+
+</body>
+</html>
