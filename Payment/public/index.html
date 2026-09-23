@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <title>Обучение: Как получить больше подписчиков</title>
+  <script src="https://js.stripe.com/v3/"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f5f7fa;
+      color: #222;
+    }
+    header {
+      background: linear-gradient(135deg, #4f46e5, #7c3aed);
+      color: #fff;
+      padding: 40px 20px;
+      text-align: center;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 2.2rem;
+    }
+    .container {
+      max-width: 900px;
+      margin: 40px auto;
+      padding: 0 20px;
+    }
+    .card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 30px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+      margin-bottom: 30px;
+    }
+    .card h2 {
+      margin-top: 0;
+      color: #4f46e5;
+    }
+    .price-tag {
+      background: #ecfdf5;
+      color: #059669;
+      padding: 10px 16px;
+      border-radius: 8px;
+      display: inline-block;
+      font-weight: bold;
+      margin: 20px 0;
+    }
+    .payment-form {
+      background: #f8fafc;
+      padding: 20px;
+      border-radius: 8px;
+      margin-top: 20px;
+    }
+    .payment-form label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: bold;
+    }
+    .payment-form input {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 1rem;
+      box-sizing: border-box;
+    }
+    .payment-form button {
+      background: #4f46e5;
+      color: #fff;
+      padding: 14px 28px;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 15px;
+      width: 100%;
+    }
+    .payment-form button:hover {
+      background: #4338ca;
+    }
+    .total {
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: #059669;
+      margin-top: 15px;
+    }
+    ul {
+      padding-left: 20px;
+    }
+    li {
+      margin-bottom: 10px;
+      line-height: 1.5;
+    }
+    footer {
+      text-align: center;
+      padding: 30px;
+      color: #666;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Обучение: Как получить больше подписчиков</h1>
+    <p>Проверенные стратегии роста аудитории в 2026 году</p>
+  </header>
+
+  <div class="container">
+
+    <div class="card">
+      <h2>О курсе</h2>
+      <p>
+        Этот курс создан для тех, кто хочет развивать свой канал, блог или страницу в социальных сетях. 
+        Вы узнаете, как привлекать живых и активных подписчиков без накруток и ботов.
+      </p>
+      <div class="price-tag">Оплата: 0,21$ в час обучения</div>
+    </div>
+
+    <div class="card">
+      <h2>Что вы получите</h2>
+      <ul>
+        <li>Понимание, как работают алгоритмы рекомендаций</li>
+        <li>Навыки создания цепляющих заголовков и обложек</li>
+        <li>Секреты удержания внимания зрителя с первых секунд</li>
+        <li>Стратегию регулярного выпуска контента без выгорания</li>
+        <li>Методы взаимодействия с аудиторией для роста лояльности</li>
+        <li>План продвижения через Shorts, Reels и другие форматы</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h2>Оплатить обучение</h2>
+      <p>Выберите количество часов обучения и оплатите securely через Stripe:</p>
+      
+      <div class="payment-form">
+        <label for="hours">Количество часов:</label>
+        <input type="number" id="hours" min="1" max="100" value="1" />
+        
+        <div class="total" id="total">Итого: 0.21$</div>
+        
+        <button id="checkout-button">Оплатить сейчас</button>
+      </div>
+    </div>
+
+  </div>
+
+  <footer>
+    © 2026 Обучение росту подписчиков. Все материалы оригинальные.
+  </footer>
+
+  <script>
+    // Инициализация Stripe с публичным ключом
+    const stripe = Stripe('pk_test_ваш_публичный_ключ_stripe');
+    
+    const hoursInput = document.getElementById('hours');
+    const totalDisplay = document.getElementById('total');
+    const checkoutButton = document.getElementById('checkout-button');
+
+    // Обновление суммы
+    function updateTotal() {
+      const hours = parseFloat(hoursInput.value) || 0;
+      const total = (hours * 0.21).toFixed(2);
+      totalDisplay.textContent = `Итого: ${total}$`;
+    }
+
+    hoursInput.addEventListener('input', updateTotal);
+    updateTotal();
+
+    // Обработка оплаты
+    checkoutButton.addEventListener('click', async () => {
+      const hours = parseFloat(hoursInput.value);
+      
+      if (!hours || hours <= 0) {
+        alert('Введите корректное количество часов');
+        return;
+      }
+
+      checkoutButton.disabled = true;
+      checkoutButton.textContent = 'Обработка...';
+
+      try {
+        const response = await fetch('/create-checkout-session', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ hours }),
+        });
+
+        const data = await response.json();
+
+        if (data.error) {
+          alert('Ошибка: ' + data.error);
+          checkoutButton.disabled = false;
+          checkoutButton.textContent = 'Оплатить сейчас';
+          return;
+        }
+
+        // Перенаправление на Stripe Checkout
+        const result = await stripe.redirectToCheckout({
+          sessionId: data.sessionId,
+        });
+
+        if (result.error) {
+          alert(result.error.message);
+          checkoutButton.disabled = false;
+          checkoutButton.textContent = 'Оплатить сейчас';
+        }
+      } catch (error) {
+        console.error('Ошибка:', error);
+        alert('Произошла ошибка при оплате');
+        checkoutButton.disabled = false;
+        checkoutButton.textContent = 'Оплатить сейчас';
+      }
+    });
+  </script>
+
+</body>
+</html>
